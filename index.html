@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formula Flip - Impara a Invertire le Formule</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1200px;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .stat-item {
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-label {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .game-area {
+            display: flex;
+            flex: 1;
+            padding: 30px;
+            gap: 30px;
+        }
+
+        .formula-section {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .formula-title {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .formula-display {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(102, 126, 234, 0.2);
+            word-break: break-all;
+        }
+
+        .target-variable {
+            text-align: center;
+            font-size: 1.5em;
+            color: #e74c3c;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .target-variable span {
+            background: #fff3cd;
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #ffc107;
+        }
+
+        .answers-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .answer-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.6);
+        }
+
+        .answer-btn:active {
+            transform: translateY(1px);
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+        }
+
+        .answer-btn.wrong {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .answer-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.5s;
+            pointer-events: none;
+        }
+
+        .answer-btn:hover::before {
+            left: 100%;
+        }
+
+        .abacus-section {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 120px;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .abacus {
+            width: 100px;
+            height: 150px;
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(139, 69, 19, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 5px solid #654321;
+        }
+
+        .abacus-frame {
+            position: absolute;
+            width: 90px;
+            height: 130px;
+            background: #CD853F;
+            border-radius: 5px;
+            border: 3px solid #8B4513;
+        }
+
+        .abacus-rod {
+            position: absolute;
+            width: 6px;
+            height: 100px;
+            background: #8B4513;
+            border-radius: 3px;
+        }
+
+        .abacus-rod:nth-child(1) { left: 20px; }
+        .abacus-rod:nth-child(2) { left: 40px; }
+        .abacus-rod:nth-child(3) { left: 60px; }
+
+        .abacus-bead {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: #FFD700;
+            border-radius: 50%;
+            border: 2px solid #DAA520;
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .bead-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .skill-badge {
+            position: absolute;
+            bottom: -10px;
+            background: #27ae60;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.5);
+        }
+
+        .money-badge {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            background: #f39c12;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8em;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+            50% { transform: translateX(-50%) scale(1.1); opacity: 0.8; }
+        }
+
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px 60px;
+            border-radius: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            color: white;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            box-shadow: 0 10px 30px rgba(46, 204, 113, 0.5);
+        }
+
+        .feedback.wrong {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.5);
+        }
+
+        .level-up {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 40px 80px;
+            border-radius: 20px;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(243, 156, 18, 0.6);
+            z-index: 1000;
+            opacity: 0;
+            animation: levelUp 2s ease-out;
+        }
+
+        @keyframes levelUp {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        }
+
+        .controls {
+            background: #2c3e50;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn.reset {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn.reset:hover {
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.6);
+        }
+
+        .difficulty-indicator {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* QR Code Modal */
+        .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .qr-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .qr-content h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .qr-content p {
+            margin: 15px 0;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .qr-image {
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            border: 5px solid #667eea;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .close-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 900px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .abacus-section {
+                position: static;
+                transform: none;
+                width: 100%;
+                height: auto;
+                margin-top: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- QR Code Modal -->
+    <div class="qr-modal" id="qrModal">
+        <div class="qr-content">
+            <h2>📱 Gioca da Smartphone!</h2>
+            <p>Scansiona questo QR code per giocare da cellulare</p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://fcepolina-cell.github.io/formule/" alt="QR Code" class="qr-image">
+            <p><strong>URL:</strong> https://fcepolina-cell.github.io/formule/</p>
+            <button class="close-btn" onclick="closeQR()">Chiudi</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="header">
+            <h1>🎮 Formula Flip 🎮</h1>
+            <button class="btn" style="position: absolute; top: 20px; left: 20px; padding: 10px 20px; font-size: 1em;" onclick="showQR()">
+                📱 QR Code
+            </button>
+            <div class="abacus-section">
+                <div class="abacus">
+                    <div class="abacus-frame">
+                        <div class="abacus-rod"></div>
+                        <div class="abacus-rod"></div>
+                        <div class="abacus-rod"></div>
+                        <div style="position: absolute; top: 20px; left: 10px; display: flex; gap: 20px;">
+                            <div class="bead-row">
+                                <div class="abacus-bead"></div>
+                                <div class="abacus-bead"></div>
+                                <div class="abacus-bead"></div>
+                            </div>
+                            <div class="bead-row" style="margin-top: 35px;">
+                                <div class="abacus-bead"></div>
+                                <div class="abacus-bead"></div>
+                                <div class="abacus-bead"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="skill-badge" id="skill-badge">0</div>
+                    <div class="money-badge" id="money-badge">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-label">LIVELLO</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">PUNTEGGIO</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">CORRETTE</div>
+                <div class="stat-value" id="correct">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">SBAGLIATE</div>
+                <div class="stat-value" id="wrong">0</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="formula-section">
+                <div class="formula-title">Inverti questa formula:</div>
+                <div class="formula-display" id="formula">Caricamento...</div>
+                <div class="target-variable">Trova: <span id="target">?</span></div>
+                <div class="difficulty-indicator" id="difficulty">Difficoltà: Facile</div>
+            </div>
+
+            <div class="answers-section">
+                <button class="answer-btn" id="answer1">Caricamento...</button>
+                <button class="answer-btn" id="answer2">Caricamento...</button>
+                <button class="answer-btn" id="answer3">Caricamento...</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="next-btn">⏭️ Prossima Formula</button>
+            <button class="btn reset" id="reset-btn">🔄 Reset Gioco</button>
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    <div class="level-up" id="level-up">LIVELLO SUPERATO! 🎉</div>
+
+    <script>
+        // STATISTICHE DI GIOCO
+        let gameStats = {
+            level: 1,
+            score: 0,
+            correct: 0,
+            wrong: 0,
+            skillPoints: 0,
+            coins: 0,
+            streak: 0,
+            maxStreak: 0
+        };
+
+        // CONFIGURAZIONE LIVELLI - DIFFICOLTÀ BILANCIATA
+        const levelConfig = {
+            1: { difficulty: 'facile', patterns: ['simpleMul', 'simpleDiv', 'simpleAdd'], maxDepth: 1 },
+            2: { difficulty: 'facile', patterns: ['twoOps', 'simpleParen'], maxDepth: 2 },
+            3: { difficulty: 'media', patterns: ['twoOpsWithParen', 'divWithParen'], maxDepth: 2 },
+            4: { difficulty: 'media', patterns: ['complexTwoOps', 'divWithParen'], maxDepth: 3 },
+            5: { difficulty: 'difficile', patterns: ['complexParen', 'complexDiv'], maxDepth: 3 },
+            6: { difficulty: 'difficile', patterns: ['complexMultiOps', 'complexParen'], maxDepth: 4 },
+            7: { difficulty: 'esperto', patterns: ['complexMultiOps', 'complexDiv'], maxDepth: 4 },
+            8: { difficulty: 'esperto', patterns: ['complexNested', 'complexMultiOps'], maxDepth: 5 }
+        };
+
+        // VARIABILI DISPONIBILI
+        const variables = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'M', 'R', 'K', 'P', 'Q', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        const numericConstants = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 23, 25, 30, 40, 50, 56, 100];
+
+        // CLASSE PER GESTIRE LE VARIABILI UNICHE
+        class UniqueVariableGenerator {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                this.usedVariables = new Set();
+                this.index = 0;
+            }
+            
+            getNextVariable() {
+                // Trova la prima variabile non usata
+                while (this.index < variables.length) {
+                    const varName = variables[this.index];
+                    if (!this.usedVariables.has(varName)) {
+                        this.usedVariables.add(varName);
+                        this.index++;
+                        return varName;
+                    }
+                    this.index++;
+                }
+                
+                // Se tutte le variabili sono usate, resetta
+                this.reset();
+                return this.getNextVariable();
+            }
+            
+            getAllUsed() {
+                return Array.from(this.usedVariables);
+            }
+        }
+
+        // FUNZIONI DI GENERAZIONE FORMULE (CORRETTE) - OGNI VARIABILE UNICA
+        function generateSimpleMultiplication() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}*${B}=${C}`,
+                correctAnswer: `${C}/${A}`,
+                target: B
+            };
+        }
+
+        function generateSimpleDivision() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}/${B}=${C}`,
+                correctAnswer: `${A}/${C}`,
+                target: B
+            };
+        }
+
+        function generateSimpleAddition() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}+${B}=${C}`,
+                correctAnswer: `${C}-${A}`,
+                target: B
+            };
+        }
+
+        function generateSimpleSubtraction() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}-${B}=${C}`,
+                correctAnswer: `${A}-${C}`,
+                target: B
+            };
+        }
+
+        function generateTwoOperations() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            const D = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}*${B}+${C}=${D}`,
+                correctAnswer: `(${D}-${C})/${A}`,
+                target: B
+            };
+        }
+
+        function generateSimpleParentheses() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            const D = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}*(${B}+${C})=${D}`,
+                correctAnswer: `(${D}/${A})-${C}`,
+                target: B
+            };
+        }
+
+        function generateTwoOperationsWithParentheses() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            const D = varGen.getNextVariable();
+            const E = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}*${B}+${C}/${D}=${E}`,
+                correctAnswer: `(${E}-${C}/${D})/${A}`,
+                target: B
+            };
+        }
+
+        function generateDivisionWithParentheses() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            const D = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}/(${B}+${C})=${D}`,
+                correctAnswer: `(${A}/${D})-${C}`,
+                target: B
+            };
+        }
+
+        function generateComplexTwoOperations() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            const D = varGen.getNextVariable();
+            const E = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}*${B}+${C}*${D}=${E}`,
+                correctAnswer: `(${E}-${C}*${D})/${A}`,
+                target: B
+            };
+        }
+
+        function generateComplexParentheses() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            const D = varGen.getNextVariable();
+            const E = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}*(${B}+${C}*${D})=${E}`,
+                correctAnswer: `(${E}/${A})-${C}*${D}`,
+                target: B
+            };
+        }
+
+        function generateComplexDivision() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            const D = varGen.getNextVariable();
+            const E = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}/(${B}+${C})=${D}/${E}`,
+                correctAnswer: `(${A}*${E}/${D})-${C}`,
+                target: B
+            };
+        }
+
+        function generateComplexMultiOperations() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            const D = varGen.getNextVariable();
+            const E = varGen.getNextVariable();
+            const F = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}*${B}+${C}/${D}-${E}=${F}`,
+                correctAnswer: `(${F}+${E}-${C}/${D})/${A}`,
+                target: B
+            };
+        }
+
+        function generateComplexNested() {
+            const varGen = new UniqueVariableGenerator();
+            const A = varGen.getNextVariable();
+            const B = varGen.getNextVariable();
+            const C = varGen.getNextVariable();
+            const D = varGen.getNextVariable();
+            const E = varGen.getNextVariable();
+            const F = varGen.getNextVariable();
+            
+            return {
+                formula: `${A}*(${B}+${C}/(${D}+${E}))=${F}`,
+                correctAnswer: `(${F}/${A})-${C}/(${D}+${E})`,
+                target: B
+            };
+        }
+
+        // MAPPATURA DEI PATTERN
+        const patternFunctions = {
+            'simpleMul': generateSimpleMultiplication,
+            'simpleDiv': generateSimpleDivision,
+            'simpleAdd': generateSimpleAddition,
+            'simpleSub': generateSimpleSubtraction,
+            'twoOps': generateTwoOperations,
+            'simpleParen': generateSimpleParentheses,
+            'twoOpsWithParen': generateTwoOperationsWithParentheses,
+            'divWithParen': generateDivisionWithParentheses,
+            'complexTwoOps': generateComplexTwoOperations,
+            'complexParen': generateComplexParentheses,
+            'complexDiv': generateComplexDivision,
+            'complexMultiOps': generateComplexMultiOperations,
+            'complexNested': generateComplexNested
+        };
+
+        // FUNZIONI DI UTILITÀ
+        function getRandomConstant() {
+            return numericConstants[Math.floor(Math.random() * numericConstants.length)];
+        }
+
+        function generateRandomFormula(level) {
+            const config = levelConfig[Math.min(level, 8)];
+            const patterns = config.patterns;
+            const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+            const formulaData = patternFunctions[pattern]();
+            
+            return {
+                formula: formulaData.formula,
+                target: formulaData.target,
+                correctAnswer: formulaData.correctAnswer
+            };
+        }
+
+        function generateWrongAnswers(correctAnswer, target, formula) {
+            const candidates = [
+                // Pattern 1: Scambia operatori
+                correctAnswer
+                    .replace(/\//g, '*')
+                    .replace(/\*/g, '/')
+                    .replace(/\+/g, '-')
+                    .replace(/-/g, '+'),
+                
+                // Pattern 2: Rimuovi parentesi
+                correctAnswer
+                    .replace(/\(/g, '')
+                    .replace(/\)/g, ''),
+                
+                // Pattern 3: Aggiungi costante
+                `(${correctAnswer})+${getRandomConstant()}`,
+                
+                // Pattern 4: Inverti variabili
+                correctAnswer.replace(/([A-Z])/g, match => {
+                    const idx = variables.indexOf(match);
+                    return idx >= 0 && idx < variables.length - 1 ? variables[idx + 1] : match;
+                }),
+                
+                // Pattern 5: Scambia numeratore e denominatore
+                correctAnswer.includes('/') ? 
+                    correctAnswer.split('/').reverse().join('/') : 
+                    `${correctAnswer}*${getRandomConstant()}`,
+                
+                // Pattern 6: Aggiungi parentesi in posizione sbagliata
+                `(${correctAnswer})`
+            ];
+
+            // Filtra risposte errate valide
+            const filtered = candidates.filter(ans => 
+                ans !== correctAnswer && 
+                ans.length < 100 &&
+                ans.trim() !== ''
+            );
+
+            // Assicura che ci siano almeno 2 risposte
+            while (filtered.length < 2) {
+                filtered.push(`(${correctAnswer})+${getRandomConstant()}`);
+            }
+
+            // Rimuovi duplicati
+            const uniqueAnswers = [...new Set(filtered)];
+            
+            // Restituisce esattamente 2 risposte
+            return uniqueAnswers.slice(0, 2);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // FUNZIONI DI GIOCO
+        let currentFormula = '';
+        let currentTarget = '';
+        let currentCorrectAnswer = '';
+        let currentAnswers = [];
+
+        function updateStats() {
+            document.getElementById('level').textContent = gameStats.level;
+            document.getElementById('score').textContent = gameStats.score;
+            document.getElementById('correct').textContent = gameStats.correct;
+            document.getElementById('wrong').textContent = gameStats.wrong;
+            document.getElementById('skill-badge').textContent = gameStats.skillPoints;
+            document.getElementById('money-badge').textContent = gameStats.coins;
+            
+            // Aggiorna difficoltà
+            const difficultyNames = {
+                'facile': 'Facile 🟢',
+                'media': 'Media 🟡',
+                'difficile': 'Difficile 🔴',
+                'esperto': 'Esperto ⚫'
+            };
+            
+            const config = levelConfig[Math.min(gameStats.level, 8)];
+            document.getElementById('difficulty').textContent = `Difficoltà: ${difficultyNames[config.difficulty]}`;
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = isCorrect ? '✅ CORRETTO!' : '❌ SBAGLIATO!';
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+            feedback.style.opacity = '1';
+            
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+            }, 1500);
+        }
+
+        function showLevelUp() {
+            const levelUp = document.getElementById('level-up');
+            levelUp.textContent = `LIVELLO ${gameStats.level} SUPERATO! 🎉`;
+            levelUp.style.opacity = '1';
+            
+            setTimeout(() => {
+                levelUp.style.opacity = '0';
+            }, 2000);
+        }
+
+        function generateNewFormula() {
+            const formulaData = generateRandomFormula(gameStats.level);
+            
+            currentFormula = formulaData.formula;
+            currentTarget = formulaData.target;
+            currentCorrectAnswer = formulaData.correctAnswer;
+            
+            document.getElementById('formula').textContent = currentFormula;
+            document.getElementById('target').textContent = currentTarget;
+            
+            // Genera risposte
+            const wrongAnswers = generateWrongAnswers(
+                currentCorrectAnswer, 
+                currentTarget, 
+                currentFormula
+            );
+            
+            // Assicura che ci siano 3 risposte
+            const allAnswers = [
+                currentCorrectAnswer, 
+                ...wrongAnswers,
+                ...wrongAnswers.slice(0, 1) // Aggiunge una copia se necessario
+            ].slice(0, 3);
+            
+            shuffleArray(allAnswers);
+            
+            currentAnswers = allAnswers;
+            
+            // Mostra risposte
+            const answerButtons = [
+                document.getElementById('answer1'),
+                document.getElementById('answer2'),
+                document.getElementById('answer3')
+            ];
+            
+            answerButtons.forEach((btn, i) => {
+                btn.textContent = currentAnswers[i];
+                btn.className = 'answer-btn';
+                btn.onclick = () => checkAnswer(i);
+                btn.disabled = false;
+            });
+        }
+
+        function checkAnswer(index) {
+            const isCorrect = currentAnswers[index] === currentCorrectAnswer;
+            
+            // Disabilita tutti i pulsanti
+            const answerButtons = [
+                document.getElementById('answer1'),
+                document.getElementById('answer2'),
+                document.getElementById('answer3')
+            ];
+            
+            answerButtons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (currentAnswers[i] === currentCorrectAnswer) {
+                    btn.className = 'answer-btn correct';
+                } else if (i === index && !isCorrect) {
+                    btn.className = 'answer-btn wrong';
+                }
+            });
+            
+            showFeedback(isCorrect);
+            
+            if (isCorrect) {
+                gameStats.correct++;
+                gameStats.streak++;
+                gameStats.maxStreak = Math.max(gameStats.maxStreak, gameStats.streak);
+                
+                // Calcola punti
+                let points = 10;
+                if (gameStats.streak >= 3) points += 5;
+                if (gameStats.streak >= 5) points += 5;
+                
+                gameStats.score += points;
+                gameStats.skillPoints += 1;
+                gameStats.coins += Math.floor(Math.random() * 3) + 1;
+                
+                // LIVELLO AUMENTA CON VELOCITÀ BILANCIATA (ogni 5 risposte corrette)
+                if (gameStats.correct % 5 === 0 && gameStats.level < 8) {
+                    gameStats.level++;
+                    showLevelUp();
+                }
+            } else {
+                gameStats.wrong++;
+                gameStats.streak = 0;
+            }
+            
+            updateStats();
+        }
+
+        function resetGame() {
+            gameStats = {
+                level: 1,
+                score: 0,
+                correct: 0,
+                wrong: 0,
+                skillPoints: 0,
+                coins: 0,
+                streak: 0,
+                maxStreak: 0
+            };
+            
+            updateStats();
+            generateNewFormula();
+        }
+
+        // FUNZIONI QR CODE
+        function showQR() {
+            document.getElementById('qrModal').style.display = 'flex';
+        }
+
+        function closeQR() {
+            document.getElementById('qrModal').style.display = 'none';
+        }
+
+        // INIZIALIZZAZIONE
+        document.getElementById('next-btn').onclick = generateNewFormula;
+        document.getElementById('reset-btn').onclick = resetGame;
+
+        // Avvia il gioco
+        updateStats();
+        generateNewFormula();
+
+        // Fullscreen su Mac (se supportato)
+        if (navigator.platform.includes('Mac')) {
+            document.documentElement.style.height = '100vh';
+            document.body.style.height = '100vh';
+        }
+    </script>
+</body>
+</html>

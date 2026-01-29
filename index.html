@@ -209,19 +209,23 @@
             box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
         }
 
-        .feedback {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 30px 60px;
-            border-radius: 20px;
-            font-size: 2em;
-            font-weight: bold;
-            color: white;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
+        /* ===================== */
+        /* ⬅ FIX IMPORTANTISSIMO */
+        /* ===================== */
+        .feedback,
+        .level-up{
+            position:fixed;
+            top:50%;
+            left:50%;
+            transform:translate(-50%,-50%);
+            padding:30px 60px;
+            border-radius:20px;
+            font-size:2em;
+            color:white;
+            z-index:1000;
+            opacity:0;
+            pointer-events:none; /* ← QUESTA È LA SOLUZIONE */
+            transition:opacity .3s;
         }
 
         .feedback.correct {

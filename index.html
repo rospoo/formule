@@ -545,6 +545,7 @@
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
 </head>
 <body>
     <!-- Modal per inserimento nome -->
@@ -575,6 +576,9 @@
                     <tr><td colspan="5">Caricamento...</td></tr>
                 </tbody>
             </table>
+            <button class="btn reset" onclick="resetLeaderboard()" style="margin-top: 15px; margin-right: 10px;">
+                🗑️ Reset Classifica
+            </button>
             <button class="close-btn" onclick="closeLeaderboard()">Chiudi</button>
         </div>
     </div>
@@ -875,6 +879,18 @@
                 wrong: gameStats.wrong,
                 lastUpdate: Date.now()
             });
+        }
+
+        function resetLeaderboard() {
+            if (confirm("⚠️ ATTENZIONE!\n\nSei sicuro di voler resettare la classifica?\nTutti i punteggi saranno cancellati per TUTTI i giocatori!")) {
+                db.ref(`rooms/${ROOM_NAME}/players`).remove()
+                    .then(() => {
+                        alert("✅ Classifica resettata con successo!");
+                    })
+                    .catch((error) => {
+                        alert("❌ Errore durante il reset: " + error.message);
+                    });
+            }
         }
 
         function listenToLeaderboard() {
